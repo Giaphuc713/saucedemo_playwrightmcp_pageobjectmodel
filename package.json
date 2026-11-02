@@ -1,0 +1,36 @@
+{
+    "name": "playwright-ts-web-pom",
+    "version": "1.0.0",
+    "description": "Playwright Page Object Model with TypeScript",
+    "main": "index.js",
+    "scripts": {
+        "test": "npx playwright test",
+        "test:dev": "cross-env TEST_ENV=dev DOTENV_CONFIG_QUIET=true npx playwright test",
+        "test:uat": "cross-env TEST_ENV=uat DOTENV_CONFIG_QUIET=true npx playwright test",
+        "test:stage": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test",
+        "test:about": "cross-env TEST_ENV=dev DOTENV_CONFIG_QUIET=true npx playwright test src/tests/about/about.test.ts",
+        "test:shopping": "cross-env TEST_ENV=dev DOTENV_CONFIG_QUIET=true npx playwright test src/tests/shopping/shopping.test.ts",
+        "test:data-picker": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test src/tests/data-picker/data-picker.test.ts",
+        "test:headed": "npx playwright test --headed",
+        "test:debug": "npx playwright test --debug",
+        "test:chrome": "npx playwright test --project=chrome",
+        "test:firefox": "npx playwright test --project=firefox",
+        "test:smoke": "npx playwright test --grep @smoke",
+        "test:regression": "npx playwright test --grep @regression",
+        "test:data-table": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @data-table",
+        "test:tabs-window": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @tabs-window",
+        "test:infinitive-scroll": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @infinitive-scroll",
+        "report": "npx playwright show-report"
+    },
+    "keywords": [],
+    "author": "Darshaan Chavda",
+    "license": "ISC",
+    "devDependencies": {
+        "@playwright/test": "^1.51.0",
+        "@types/node": "^20.10.5",
+        "cross-env": "^10.1.0"
+    },
+    "dependencies": {
+        "dotenv": "^17.4.2"
+    }
+}
