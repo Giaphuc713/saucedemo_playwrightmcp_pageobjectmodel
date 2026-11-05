@@ -30,11 +30,15 @@ export class DataTablePage extends BasePage {
     readonly deleteBookDialog: Locator = this.page.getByTestId('delete-book-dialog');
     readonly deleteDialogCancelButton: Locator = this.page.getByTestId('delete-dialog-cancel');
     readonly deleteDialogConfirmButton: Locator = this.page.getByRole('button', { name: 'Confirm delete Dune' });
+    readonly searchTable: Locator = this.page.getByRole('searchbox', { name: 'Search books', exact: true });
+    readonly filterButton: Locator = this.page.getByRole('combobox', { name: 'Filter by genre', exact: true });
+    readonly rowcounts: Locator = this.page.getByTestId('row-count');
+
     async getAllHeaders(): Promise<string[]> {
         const headerLocators = [this.srNo, this.colBookName, this.colBookGenre, this.colBookAuthor, this.colBookISBN, this.colBookPublished, this.colBookActions];
         const headerTexts = [];
         for (const header of headerLocators) {
-            const text = (await header.textContent() || '').replace('⇅', '').trim();
+            const text = ((await header.textContent()) || '').replace('⇅', '').trim();
             headerTexts.push(text);
         }
         return headerTexts;
@@ -46,12 +50,12 @@ export class DataTablePage extends BasePage {
         const text = await this.totalTabOfTable.innerText();
         const match = text.match(/of\s+(\d+)/i);
         if (!match) throw new Error(`Không đọc được số page từ: "${text}"`);
-        console.log("totalTabOfTable", Number(match[1]))
+        console.log('totalTabOfTable', Number(match[1]));
         return Number(match[1]);
     }
     async getRowTotalBook(): Promise<number> {
         await expect(this.rowOfTable.first()).toBeVisible();
-        console.log("rowTotalBook", await this.rowOfTable.count())
+        console.log('rowTotalBook', await this.rowOfTable.count());
         return await this.rowOfTable.count();
     }
 
@@ -77,13 +81,7 @@ export class DataTablePage extends BasePage {
         }
     }
 
-    async addBook(book: {
-        name: string;
-        author: string;
-        genre: string;
-        isbn: string;
-        published: string;
-    }): Promise<void> {
+    async addBook(book: { name: string; author: string; genre: string; isbn: string; published: string }): Promise<void> {
         await this.addBookButton.click();
         await this.addBookName.fill(book.name);
         await this.addBookAuthor.fill(book.author);
@@ -92,9 +90,12 @@ export class DataTablePage extends BasePage {
         await this.addBookPublished.fill(book.published);
         await this.addDialogSaveButton.click();
     }
+    async clickTabNumber(pageNumber: number): Promise<void> {
+        const tabLocator = this.page.getByTestId(`pagination-page-${pageNumber}`);
+        await tabLocator.click();
+    }
 
     async totalRowOfTable(): Promise<number> {
-        await this.pageOne.click();
         const totalTabOfTable = await this.getTotalTabOfTable();
         let totalRowCount = 0;
         for (let i = 1; i <= totalTabOfTable; i++) {
@@ -104,4 +105,32 @@ export class DataTablePage extends BasePage {
         return totalRowCount;
     }
 
+    async getBookRowByFilter(): Promise<number> {
+        const value = await this.rowcounts.innerText();
+        const match = value.match(/^(\d+)\s+books?\b/i);
+        if (!match) throw new Error(`Không đọc được số sách đã lọc từ: "${value}"`);
+        return Number(match[1]);
+    }
+
+    async filterAndVerifyBookCounts(): Promise<void> {
+        const genres = ['Technology', 'Fantasy', 'Science Fiction', 'Dystopian', 'Fiction', 'Non-Fiction'];
+        await this.page.waitForLoadState('networkidle');
+
+        for (const genre of genres) {
+            await this.filterButton.selectOption({ value: genre });
+            await expect(this.filterButton).toHaveValue(genre);
+
+            const filteredBookCount = await this.getBookRowByFilter();
+            await expect
+                .poll(() => this.rowOfTable.count(), {
+                    message: `Số hàng hiển thị không khớp với số sách đã lọc "${genre}"`,
+                })
+                .toBe(filteredBookCount);
+            await expect(
+                this.rowOfTable.filter({
+                    hasNot: this.page.getByRole('cell', { name: genre, exact: true }),
+                })
+            ).toHaveCount(0);
+        }
+    }
 }

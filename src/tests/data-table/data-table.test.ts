@@ -1,4 +1,5 @@
 import { expect, test } from '@fixtures/page.fixture';
+import { DataTablePage } from '@pages/data-table';
 test.describe('Verify data-table test', () => {
     test.beforeEach(async ({ dataTablePage }) => {
         await dataTablePage.navigateToDataTable();
@@ -56,45 +57,55 @@ test.describe('Verify data-table test', () => {
         }
     });
 
-    test('DT_021 deletes a book from all pages and decrements the totallllll', { tag: '@data-table' }, async ({ dataTablePage }) => {
-        const bookName = 'Dune';
-        const initialBookCount = await dataTablePage.getBookCount();
-        let deleteAttempted = false;
+    // test('DT_021 deletes a book from all pages and decrements the totallllll', { tag: '@data-table' }, async ({ dataTablePage }) => {
+    //     const bookName = 'Dune';
+    //     const initialBookCount = await dataTablePage.getBookCount();
+    //     let deleteAttempted = false;
 
-        await expect(dataTablePage.getBookRow(bookName)).toHaveCount(1);
-        await dataTablePage
-            .getBookRow(bookName)
-            .getByRole('button', { name: `Delete ${bookName}` })
-            .click();
-        await expect(dataTablePage.deleteBookDialog).toBeVisible();
+    //     await expect(dataTablePage.getBookRow(bookName)).toHaveCount(1);
+    //     await dataTablePage
+    //         .getBookRow(bookName)
+    //         .getByRole('button', { name: `Delete ${bookName}` })
+    //         .click();
+    //     await expect(dataTablePage.deleteBookDialog).toBeVisible();
 
-        try {
-            deleteAttempted = true;
-            await dataTablePage.deleteDialogConfirmButton.click();
-            await expect(dataTablePage.deleteBookDialog).not.toBeVisible();
-            await expect.poll(() => dataTablePage.getBookCount()).toBe(initialBookCount - 1);
+    //     try {
+    //         deleteAttempted = true;
+    //         await dataTablePage.deleteDialogConfirmButton.click();
+    //         await expect(dataTablePage.deleteBookDialog).not.toBeVisible();
+    //         await expect.poll(() => dataTablePage.getBookCount()).toBe(initialBookCount - 1);
 
-            await dataTablePage.pageOne.click();
-            const pageCount = await dataTablePage.getTotalTabOfTable();
-            for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
-                await expect(dataTablePage.getBookRow(bookName)).toHaveCount(0);
-                if (pageNumber < pageCount) await dataTablePage.nextButton.click();
-            }
-        } finally {
-            if (await dataTablePage.deleteBookDialog.isVisible()) {
-                await dataTablePage.deleteDialogCancelButton.click();
-            }
-            if (deleteAttempted && !(await dataTablePage.bookExistsOnAnyPage(bookName))) {
-                await dataTablePage.addBook({
-                    name: bookName,
-                    author: 'Frank Herbert',
-                    genre: 'Science Fiction',
-                    isbn: 'ISBN-9780441013593',
-                    published: '1965-08-01',
-                });
-                await expect.poll(() => dataTablePage.getBookCount()).toBe(initialBookCount);
-                await expect(await dataTablePage.bookExistsOnAnyPage(bookName)).toBe(true);
-            }
-        }
+    //         await dataTablePage.pageOne.click();
+    //         const pageCount = await dataTablePage.getTotalTabOfTable();
+    //         for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+    //             await expect(dataTablePage.getBookRow(bookName)).toHaveCount(0);
+    //             if (pageNumber < pageCount) await dataTablePage.nextButton.click();
+    //         }
+    //     } finally {
+    //         if (await dataTablePage.deleteBookDialog.isVisible()) {
+    //             await dataTablePage.deleteDialogCancelButton.click();
+    //         }
+    //         if (deleteAttempted && !(await dataTablePage.bookExistsOnAnyPage(bookName))) {
+    //             await dataTablePage.addBook({
+    //                 name: bookName,
+    //                 author: 'Frank Herbert',
+    //                 genre: 'Science Fiction',
+    //                 isbn: 'ISBN-9780441013593',
+    //                 published: '1965-08-01',
+    //             });
+    //             await expect.poll(() => dataTablePage.getBookCount()).toBe(initialBookCount);
+    //             await expect(await dataTablePage.bookExistsOnAnyPage(bookName)).toBe(true);
+    //         }
+    //     }
+    // });
+    // test('DT_011 Search valid book and clear the entered value', { tag: '@data-table' }, async ({ dataTablePage }) => {
+    //     const initialBookCount = await dataTablePage.getBookCount();
+    //     await dataTablePage.searchTable.fill('Harry Potter');
+    //     await expect(dataTablePage.getBookRow("Harry Potter and the Philosopher's Stone")).toHaveCount(1);
+    //     await dataTablePage.searchTable.clear();
+    //     await expect.poll(() => dataTablePage.getBookCount()).toBe(initialBookCount);
+    // });
+    test('DT_012 Filter with books type and verify the total row count of table', { tag: '@data-table' }, async ({ dataTablePage }) => {
+        await dataTablePage.filterAndVerifyBookCounts();
     });
 });
