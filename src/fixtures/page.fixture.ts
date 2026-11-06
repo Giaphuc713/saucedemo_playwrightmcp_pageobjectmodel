@@ -7,6 +7,7 @@ import { DataPickerPage } from '@pages/data-picker.page';
 import { DataTablePage } from '@pages/data-table';
 import { InfinitiveScrollPage } from '@pages/infinitive-scroll.page';
 import { TabsWindowPage } from '@pages/tabs-window.page';
+import { ModelWindowPage } from '@pages/model-window.page';
 
 type PageFixtures = {
     loginPage: LoginPage;
@@ -17,6 +18,7 @@ type PageFixtures = {
     dataTablePage: DataTablePage;
     infinitiveScrollPage: InfinitiveScrollPage;
     tabsWindowPage: TabsWindowPage;
+    modelWindowPage: ModelWindowPage;
 };
 
 export const test = base.extend<PageFixtures>({
@@ -46,6 +48,9 @@ export const test = base.extend<PageFixtures>({
     },
     tabsWindowPage: async ({ page }, use) => {
         await use(new TabsWindowPage(page));
+    },
+    modelWindowPage: async ({ page }, use) => {
+        await use(new ModelWindowPage(page));
     },
 });
 

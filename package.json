@@ -17,6 +17,7 @@
         "test:firefox": "npx playwright test --project=firefox",
         "test:smoke": "npx playwright test --grep @smoke",
         "test:regression": "npx playwright test --grep @regression",
+        "test:model-window": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @model-window",
         "test:data-table": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @data-table",
         "test:tabs-window": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @tabs-window",
         "test:infinitive-scroll": "cross-env TEST_ENV=stage DOTENV_CONFIG_QUIET=true npx playwright test --grep @infinitive-scroll",
